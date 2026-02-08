@@ -1,5 +1,6 @@
 """Database connection and session management."""
 
+import ssl
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 
@@ -11,11 +12,25 @@ class Base(DeclarativeBase):
     pass
 
 
+# Create SSL context for Neon PostgreSQL
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
+
+# Get database URL and strip query params that asyncpg doesn't understand
+db_url = get_settings().database_url
+# Remove sslmode/ssl/channel_binding params - we handle SSL via connect_args
+for param in ["sslmode=require", "ssl=require", "channel_binding=require", "&channel_binding=require"]:
+    db_url = db_url.replace(param, "")
+# Clean up trailing ? or &
+db_url = db_url.rstrip("?&").replace("?&", "?").replace("&&", "&")
+
 # Create async engine
 engine = create_async_engine(
-    get_settings().database_url,
+    db_url,
     echo=False,
     pool_pre_ping=True,
+    connect_args={"ssl": ssl_context},
 )
 
 # Create async session factory

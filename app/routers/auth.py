@@ -1,7 +1,7 @@
 """Authentication endpoints: signup, signin, session, signout."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
@@ -34,44 +34,49 @@ class AuthResponse(BaseModel):
     accessToken: str
 
 
-@router.post("/signup", response_model=AuthResponse)
+@router.post("/signup")
 async def signup(
     data: SignUpRequest,
     db: AsyncSession = Depends(get_db),
-) -> AuthResponse:
+):
     """Register a new user."""
-    # Check if email already exists
-    result = await db.execute(
-        select(User).where(User.email == data.email.lower().strip())
-    )
-    if result.scalar_one_or_none():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered",
+    try:
+        # Check if email already exists
+        result = await db.execute(
+            select(User).where(User.email == data.email.lower().strip())
         )
+        if result.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
+            )
 
-    # Create user
-    user = User(
-        email=data.email.lower().strip(),
-        name=data.name,
-        hashed_password=pwd_context.hash(data.password),
-    )
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
+        # Create user
+        user = User(
+            email=data.email.lower().strip(),
+            name=data.name,
+            hashed_password=pwd_context.hash(data.password),
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
 
-    # Generate JWT
-    token = create_token(user.id)
+        # Generate JWT
+        token = create_token(user.id)
 
-    return AuthResponse(
-        user={
-            "id": user.id,
-            "email": user.email,
-            "name": user.name,
-            "createdAt": user.created_at.isoformat(),
-        },
-        accessToken=token,
-    )
+        return {
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "name": user.name,
+                "createdAt": user.created_at.isoformat(),
+            },
+            "accessToken": token,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {"error": str(type(e).__name__), "detail": str(e)}
 
 
 @router.post("/signin", response_model=AuthResponse)

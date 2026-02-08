@@ -61,6 +61,19 @@ async def health_check():
     return {"status": "ok"}
 
 
+@app.get("/db-test")
+async def db_test():
+    """Test database connection."""
+    try:
+        from app.database import engine
+        from sqlalchemy import text
+        async with engine.connect() as conn:
+            result = await conn.execute(text("SELECT 1"))
+            return {"db": "connected", "result": str(result.scalar())}
+    except Exception as e:
+        return {"db": "error", "detail": str(e)}
+
+
 # Import and include routers after app is created to avoid circular imports
 from app.routers import tasks  # noqa: E402
 from app.routers import chat  # noqa: E402
