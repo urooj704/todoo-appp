@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 30, 30, 46;
+  --background-start: #f0f0ff;
+  --background-end: #e8eaff;
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --brand-gradient: linear-gradient(135deg, #6366f1 0%, #818cf8 50%, #a78bfa 100%);
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  min-height: 100vh;
+  background: var(--background-start);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.15), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(167, 139, 250, 0.1), transparent),
+    radial-gradient(ellipse 50% 30% at 20% 80%, rgba(129, 140, 248, 0.08), transparent);
+}
+
+/* Glassmorphism panel */
+@layer components {
+  .glass-panel {
+    @apply relative overflow-hidden;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  }
+
+  .glass-panel-strong {
+    @apply relative overflow-hidden;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .btn {
+    @apply px-4 py-2 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply text-white focus:ring-brand-500;
+    background: var(--brand-gradient);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    @apply bg-white/80 text-gray-700 hover:bg-white focus:ring-gray-400 border border-gray-200/60;
+    backdrop-filter: blur(8px);
+  }
+
+  .btn-danger {
+    @apply bg-red-500 text-white hover:bg-red-600 focus:ring-red-500;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+  }
+
+  .input {
+    @apply w-full px-4 py-2.5 border border-gray-200/60 rounded-xl shadow-sm
+           focus:outline-none focus:ring-2 focus:ring-brand-400/40 focus:border-brand-400
+           bg-white/70 backdrop-blur-sm transition-all duration-200
+           placeholder:text-gray-400;
+  }
+
+  .input:focus {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  .input-error {
+    @apply border-red-400 focus:ring-red-400/40 focus:border-red-400;
+  }
+
+  .card {
+    @apply glass-panel rounded-2xl p-6 transition-all duration-300;
+  }
+
+  .card:hover {
+    box-shadow:
+      0 20px 40px -5px rgba(0, 0, 0, 0.1),
+      0 8px 16px -4px rgba(0, 0, 0, 0.04);
+    transform: translateY(-2px);
+  }
+
+  /* 3D task card with depth */
+  .card-3d {
+    @apply glass-panel rounded-2xl transition-all duration-300;
+    transform: perspective(1000px) rotateX(0deg);
+    transform-style: preserve-3d;
+  }
+
+  .card-3d:hover {
+    transform: perspective(1000px) rotateX(1deg) translateY(-4px);
+    box-shadow:
+      0 20px 40px -10px rgba(0, 0, 0, 0.12),
+      0 4px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* 3D icon wrapper */
+  .icon-3d {
+    @apply relative inline-flex items-center justify-center rounded-2xl;
+    transform: perspective(500px) rotateY(-5deg);
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+  }
+
+  .icon-3d:hover {
+    transform: perspective(500px) rotateY(0deg) scale(1.05);
+  }
+
+  /* Stat card with glassmorphism */
+  .stat-card {
+    @apply glass-panel rounded-2xl p-5 flex items-center gap-4 transition-all duration-300;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.35);
+}

@@ -1,0 +1,78 @@
+# Helm Values for todo-chatbot chart
+# All values are parameterizable via --set or -f overrides
+
+# -- Global namespace for all resources
+namespace: todo-local
+
+# -- Frontend (Next.js) configuration
+frontend:
+  image:
+    repository: todo-frontend
+    tag: phase4
+    pullPolicy: Never
+  replicaCount: 1
+  service:
+    type: NodePort
+    port: 3000
+    nodePort: 30080
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  env:
+    NEXT_PUBLIC_API_URL: ""
+    NEXT_PUBLIC_APP_URL: ""
+
+# -- Backend (FastAPI) configuration
+backend:
+  image:
+    repository: todo-backend
+    tag: phase4
+    pullPolicy: Never
+  replicaCount: 1
+  service:
+    type: NodePort
+    port: 8000
+    nodePort: 30081
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  env:
+    CORS_ORIGINS: ""
+    BETTER_AUTH_URL: ""
+    MCP_SERVER_URL: "http://todo-mcp:8001"
+    MAX_CONVERSATION_HISTORY: "50"
+
+# -- MCP Server configuration
+mcp:
+  image:
+    repository: todo-backend
+    tag: phase4
+    pullPolicy: Never
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 8001
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  env:
+    MCP_SERVER_PORT: "8001"
+
+# -- Secrets (override at install time, never commit real values)
+secrets:
+  databaseUrl: "REPLACE_WITH_NEON_DATABASE_URL"
+  betterAuthSecret: "REPLACE_WITH_AUTH_SECRET_MIN_32_CHARS"
+  openaiApiKey: "REPLACE_WITH_OPENAI_API_KEY"
+  chatkitWorkflowId: "REPLACE_WITH_CHATKIT_WORKFLOW_ID"

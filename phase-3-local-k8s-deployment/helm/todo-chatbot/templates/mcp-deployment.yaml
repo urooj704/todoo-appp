@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-mcp
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: todo-mcp
+    {{- include "todo-chatbot.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.mcp.replicaCount }}
+  selector:
+    matchLabels:
+      app: todo-mcp
+  template:
+    metadata:
+      labels:
+        app: todo-mcp
+        {{- include "todo-chatbot.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: mcp-server
+          image: "{{ .Values.mcp.image.repository }}:{{ .Values.mcp.image.tag }}"
+          imagePullPolicy: {{ .Values.mcp.image.pullPolicy }}
+          command: ["python", "-m", "mcp_server.run"]
+          ports:
+            - containerPort: 8001
+              protocol: TCP
+          env:
+            - name: MCP_SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "todo-chatbot.fullname" . }}-config
+                  key: MCP_SERVER_PORT
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "todo-chatbot.fullname" . }}-secrets
+                  key: DATABASE_URL
+          resources:
+            requests:
+              cpu: {{ .Values.mcp.resources.requests.cpu }}
+              memory: {{ .Values.mcp.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.mcp.resources.limits.cpu }}
+              memory: {{ .Values.mcp.resources.limits.memory }}
+          readinessProbe:
+            tcpSocket:
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
