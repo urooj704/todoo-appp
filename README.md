@@ -39,6 +39,16 @@ Cloud-native event-driven architecture (planning stage):
 | Auth | JWT (Better Auth) |
 | Deployment | Docker, Kubernetes, Helm |
 
-## Getting Started
+## Deploy on Vercel
+
+1. Import this repo on [Vercel](https://vercel.com/new)
+2. **Set Root Directory** to `phase-2-todo-app/frontend`
+3. Framework Preset: **Next.js** (auto-detected)
+4. Add environment variables:
+   - `NEXT_PUBLIC_API_URL` - Your backend API URL (e.g. `https://your-backend.onrender.com/api`)
+   - `NEXT_PUBLIC_APP_URL` - Your Vercel app URL
+5. Click **Deploy**
+
+## Getting Started (Local)
 
 See `phase-2-todo-app/specs/quickstart.md` for setup instructions.
